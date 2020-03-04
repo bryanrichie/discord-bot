@@ -1,19 +1,13 @@
 import * as discord from "discord.js";
 import * as youtubeSearch from "youtube-search";
 import * as ytdl from "ytdl-core";
-import * as gphApiClient from "giphy-js-sdk-core";
 import { config } from "dotenv";
 
-config();
-
-import {
-  randomiseGifResponse,
-  handleGifCommand,
-  gifCommand
-} from "./commands/gif";
+import { gifCommand, handleGifCommand } from "./commands/gif";
+import { kickCommand, handleKickCommand } from "./commands/kick";
 
 const client = new discord.Client();
-const giphy = gphApiClient(process.env.GIPHY_TOKEN);
+config();
 
 client.once("ready", () => {
   console.log("Ready!");
@@ -25,33 +19,15 @@ client.once("disconnecting", () => {
   console.log("Disconnecting!");
 });
 
-const kickCommand = `${process.env.PREFIX} kick`;
-
 client.on("message", async message => {
   if (message.content.startsWith(kickCommand)) {
     await handleKickCommand(message);
   }
 
   if (message.content.startsWith(gifCommand)) {
-    handleGifCommand(message);
+    await handleGifCommand(message);
   }
 });
-
-//  Function to handle the kick command
-async function handleKickCommand(message: discord.Message) {
-  if (!message.member.hasPermission(["KICK_MEMBERS", "BAN_MEMBERS"])) {
-    message.channel.send(`You don't have sufficient permissions!`);
-  } else {
-    const member = message.mentions.members.first();
-    await member.kick();
-    const kickGifs = await giphy.search("gifs", { q: "kick" });
-    const randomKickGif = randomiseGifResponse(kickGifs);
-
-    message.channel.send(`:wave: ${member.displayName} has been kicked`, {
-      files: [randomKickGif.images.fixed_height.url]
-    });
-  }
-}
 
 // music bot feature
 const queue = new Map();
