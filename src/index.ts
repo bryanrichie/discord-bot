@@ -19,15 +19,20 @@ client.once("disconnecting", () => {
   console.log("Disconnecting!");
 });
 
-client.on("message", async message => {
-  //  kick feature
-  const kickCommand = `${process.env.PREFIX} kick`;
+const kickCommand = `${process.env.PREFIX} kick`;
+const gifCommand = `${process.env.PREFIX}gif`;
 
+client.on("message", async message => {
   if (message.content.startsWith(kickCommand)) {
     await handleKickCommand(message);
   }
+
+  if (message.content.startsWith(gifCommand)) {
+    handleGifCommand(message);
+  }
 });
 
+//  Function to handle the kick command
 async function handleKickCommand(message: discord.Message) {
   if (!message.member.hasPermission(["KICK_MEMBERS", "BAN_MEMBERS"])) {
     message.channel.send(`You don't have sufficient permissions!`);
@@ -43,43 +48,35 @@ async function handleKickCommand(message: discord.Message) {
   }
 }
 
+//  Function to randomise the gif response
 function randomiseGifResponse(gifResponse: any) {
   const totalGifs = gifResponse.data.length;
   const randomIndex = Math.floor(Math.random() * 10 + 1) % totalGifs;
   return gifResponse.data[randomIndex];
 }
 
-//  gif feature
-client.on("message", message => {
-  const gifCommand = `${process.env.PREFIX}gif`;
+//  Function to handle the gif command
+async function handleGifCommand(message: discord.Message) {
+  const query = message.content.substring(gifCommand.length).trim();
 
-  if (message.content.startsWith(gifCommand)) {
-    const query = message.content.substring(gifCommand.length).trim();
-    if (!query) {
-      giphy.search("gifs", { q: "random" }).then((response: any) => {
-        const totalResponses = response.data.length;
-        const responseIndex =
-          Math.floor(Math.random() * 10 + 1) % totalResponses;
-        const responseFinal = response.data[responseIndex];
+  if (!query) {
+    const randomGif = randomiseGifResponse(
+      await giphy.search("gifs", { q: "random" })
+    );
 
-        message.channel.send({
-          files: [responseFinal.images.fixed_height.url]
-        });
-      });
-    } else {
-      giphy.search("gifs", { q: query }).then((response: any) => {
-        const totalResponses = response.data.length;
-        const responseIndex =
-          Math.floor(Math.random() * 10 + 1) % totalResponses;
-        const responseFinal = response.data[responseIndex];
+    message.channel.send({
+      files: [randomGif.images.fixed_height.url]
+    });
+  } else {
+    const gifQueryResult = randomiseGifResponse(
+      await giphy.search("gifs", { q: query })
+    );
 
-        message.channel.send({
-          files: [responseFinal.images.fixed_height.url]
-        });
-      });
-    }
+    message.channel.send({
+      files: [gifQueryResult.images.fixed_height.url]
+    });
   }
-});
+}
 
 // music bot feature
 const queue = new Map();
