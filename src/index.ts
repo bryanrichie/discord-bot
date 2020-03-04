@@ -6,6 +6,12 @@ import { config } from "dotenv";
 
 config();
 
+import {
+  randomiseGifResponse,
+  handleGifCommand,
+  gifCommand
+} from "./commands/gif";
+
 const client = new discord.Client();
 const giphy = gphApiClient(process.env.GIPHY_TOKEN);
 
@@ -20,7 +26,6 @@ client.once("disconnecting", () => {
 });
 
 const kickCommand = `${process.env.PREFIX} kick`;
-const gifCommand = `${process.env.PREFIX}gif`;
 
 client.on("message", async message => {
   if (message.content.startsWith(kickCommand)) {
@@ -44,36 +49,6 @@ async function handleKickCommand(message: discord.Message) {
 
     message.channel.send(`:wave: ${member.displayName} has been kicked`, {
       files: [randomKickGif.images.fixed_height.url]
-    });
-  }
-}
-
-//  Function to randomise the gif response
-function randomiseGifResponse(gifResponse: any) {
-  const totalGifs = gifResponse.data.length;
-  const randomIndex = Math.floor(Math.random() * 10 + 1) % totalGifs;
-  return gifResponse.data[randomIndex];
-}
-
-//  Function to handle the gif command
-async function handleGifCommand(message: discord.Message) {
-  const query = message.content.substring(gifCommand.length).trim();
-
-  if (!query) {
-    const randomGif = randomiseGifResponse(
-      await giphy.search("gifs", { q: "random" })
-    );
-
-    message.channel.send({
-      files: [randomGif.images.fixed_height.url]
-    });
-  } else {
-    const gifQueryResult = randomiseGifResponse(
-      await giphy.search("gifs", { q: query })
-    );
-
-    message.channel.send({
-      files: [gifQueryResult.images.fixed_height.url]
     });
   }
 }
