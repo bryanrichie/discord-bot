@@ -18,7 +18,6 @@ export async function handleGifCommand(message: discord.Message) {
     const randomGif = randomiseGifResponse(
       await giphy.search("gifs", { q: "random" })
     );
-
     message.channel.send({
       files: [randomGif.images.fixed_height.url]
     });

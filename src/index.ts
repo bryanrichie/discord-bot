@@ -3,11 +3,11 @@ import * as youtubeSearch from "youtube-search";
 import * as ytdl from "ytdl-core";
 import { config } from "dotenv";
 
-import { gifCommand, handleGifCommand } from "./commands/gif";
-import { kickCommand, handleKickCommand } from "./commands/kick";
-
 const client = new discord.Client();
 config();
+
+import { gifCommand, handleGifCommand } from "./commands/gif";
+import { kickCommand, handleKickCommand } from "./commands/kick";
 
 client.once("ready", () => {
   console.log("Ready!");
