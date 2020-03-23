@@ -5,7 +5,7 @@ import { randomiseGifResponse } from "./gif";
 
 const giphy = gphApiClient(process.env.GIPHY_TOKEN);
 
-export const kickCommand = `${process.env.PREFIX} kick`;
+export const kickCommand = `${process.env.PREFIX}kick`;
 
 export async function handleKickCommand(message: discord.Message) {
   if (!message.member.hasPermission(["KICK_MEMBERS", "BAN_MEMBERS"])) {
