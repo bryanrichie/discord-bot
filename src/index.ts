@@ -11,6 +11,7 @@ import {
   handlePlayCommand,
   skipCommand,
   stopCommand,
+  handleStopCommand,
   queueCommand
 } from "./commands/music";
 
@@ -31,6 +32,8 @@ client.on("message", async message => {
     await handleGifCommand(message);
   } else if (message.content.startsWith(playCommand)) {
     await handlePlayCommand(message);
+  } else if (message.content.startsWith(stopCommand)) {
+    await handleStopCommand(message);
   }
 });
 

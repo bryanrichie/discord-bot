@@ -18,7 +18,6 @@ export async function handlePlayCommand(message: discord.Message) {
 
   if (isUrl(query)) {
     songLink = query;
-    console.log(songLink);
   } else {
     const opts = {
       maxResults: 5,
@@ -54,10 +53,11 @@ export async function handlePlayCommand(message: discord.Message) {
 
   const voiceChannel = message.member.voiceChannel;
 
-  if (!voiceChannel)
+  if (!voiceChannel) {
     return message.channel.send(
       "You need to be in a voice channel to play music!"
     );
+  }
 
   const permissions = voiceChannel.permissionsFor(message.client.user);
 
@@ -73,4 +73,16 @@ export async function handlePlayCommand(message: discord.Message) {
   const connection = await voiceChannel.join();
 
   connection.playStream(ytdl(songLink));
+}
+
+export async function handleStopCommand(message: discord.Message) {
+  const voiceChannel = message.member.voiceChannel;
+
+  if (!voiceChannel) {
+    return message.channel.send(
+      "You need to be in a voice channel to stop the music!"
+    );
+  } else {
+    await voiceChannel.leave();
+  }
 }
