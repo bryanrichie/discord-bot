@@ -9,10 +9,8 @@ import { kickCommand, handleKickCommand } from "./commands/kick";
 import {
   playCommand,
   handlePlayCommand,
-  skipCommand,
   stopCommand,
   handleStopCommand,
-  queueCommand
 } from "./commands/music";
 
 client.once("ready", () => {
@@ -25,16 +23,14 @@ client.once("disconnecting", () => {
   console.log("Disconnecting!");
 });
 
-client.on("message", async message => {
-  if (message.content.startsWith(kickCommand)) {
-    await handleKickCommand(message);
-  } else if (message.content.startsWith(gifCommand)) {
-    await handleGifCommand(message);
-  } else if (message.content.startsWith(playCommand)) {
-    await handlePlayCommand(message);
-  } else if (message.content.startsWith(stopCommand)) {
-    await handleStopCommand(message);
-  }
+client.on("message", async (message) => {
+  if (message.content.startsWith(kickCommand)) await handleKickCommand(message);
+
+  if (message.content.startsWith(gifCommand)) await handleGifCommand(message);
+
+  if (message.content.startsWith(playCommand)) await handlePlayCommand(message);
+
+  if (message.content.startsWith(stopCommand)) await handleStopCommand(message);
 });
 
 client.login(`${process.env.DISCORD_TOKEN}`);
