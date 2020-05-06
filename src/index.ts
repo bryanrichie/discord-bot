@@ -7,10 +7,14 @@ config();
 import { gifCommand, handleGifCommand } from "./commands/gif";
 import { kickCommand, handleKickCommand } from "./commands/kick";
 import {
+  joinCommand,
+  handleJoinCommand,
   playCommand,
   handlePlayCommand,
   stopCommand,
   handleStopCommand,
+  leaveCommand,
+  handleLeaveCommand,
 } from "./commands/music";
 
 client.once("ready", () => {
@@ -25,12 +29,12 @@ client.once("disconnecting", () => {
 
 client.on("message", async (message) => {
   if (message.content.startsWith(kickCommand)) await handleKickCommand(message);
-
   if (message.content.startsWith(gifCommand)) await handleGifCommand(message);
-
+  if (message.content.startsWith(joinCommand)) await handleJoinCommand(message);
   if (message.content.startsWith(playCommand)) await handlePlayCommand(message);
-
   if (message.content.startsWith(stopCommand)) await handleStopCommand(message);
+  if (message.content.startsWith(leaveCommand))
+    await handleLeaveCommand(message);
 });
 
 client.login(`${process.env.DISCORD_TOKEN}`);
