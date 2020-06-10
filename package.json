@@ -21,7 +21,7 @@
     "opusscript": "0.0.7",
     "ts-node-dev": "^1.0.0-pre.44",
     "youtube-search": "^1.1.4",
-    "ytdl-core": "^2.1.1"
+    "ytdl-core": "^2.1.7"
   },
   "devDependencies": {
     "dotenv": "^8.2.0",

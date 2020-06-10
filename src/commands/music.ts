@@ -55,8 +55,10 @@ export async function handlePlayCommand(message: discord.Message) {
   const dispatcher = await connection.playStream(
     ytdl(query, {
       filter: "audioonly",
+      quality: "highestaudio",
     })
   );
+  dispatcher.setVolume(0.2);
   return await message.channel.send(`**Now playing: ${info.title}**`);
 }
 
