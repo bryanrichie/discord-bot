@@ -12,7 +12,6 @@
   "author": "Bryan Lee",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^13.13.4",
     "discord.js": "^11.6.4",
     "ffmpeg": "0.0.4",
     "ffmpeg-binaries": "^4.0.0",
@@ -24,6 +23,8 @@
     "ytdl-core": "^2.1.7"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.157",
+    "@types/node": "^13.13.4",
     "dotenv": "^8.2.0",
     "typescript": "^3.8.3"
   }
