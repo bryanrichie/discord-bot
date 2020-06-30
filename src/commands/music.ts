@@ -6,6 +6,7 @@ import * as _ from "lodash";
 export const joinCommand = `${process.env.PREFIX}join`;
 export const playCommand = `${process.env.PREFIX}play`;
 export const stopCommand = `${process.env.PREFIX}stop`;
+export const skipCommand = `${process.env.PREFIX}skip`;
 export const leaveCommand = `${process.env.PREFIX}leave`;
 
 let playQueue: string[] = [];
@@ -95,7 +96,9 @@ export async function handleStopCommand(message: discord.Message) {
       `**Please connect to a voice channel to use this command!**`
     );
   } else if (!message.guild.me.voiceChannel) {
-    return await message.channel.send(`**I'm not currently in a channel!**`);
+    return await message.channel.send(
+      `**I'm not current connected to a channel!**`
+    );
   } else if (
     message.guild.me.voiceChannel &&
     message.guild.me.voiceChannel !== message.member.voiceChannel
@@ -110,12 +113,40 @@ export async function handleStopCommand(message: discord.Message) {
   if (dispatcher) {
     dispatcher.end();
     await message.channel.send(`**Music has been stopped!**`);
-    console.log("music stopped", playQueue);
   } else {
     return await message.channel.send(
       `**I'm not currently playing any music!**`
     );
   }
+}
+
+//  SKIP COMMAND
+export async function handleSkipCommand(message: discord.Message) {
+  if (!message.member.voiceChannel) {
+    return await message.channel.send(
+      `**Please connect to a voice channel to use this command!**`
+    );
+  } else if (!message.guild.me.voiceChannel) {
+    return await message.channel.send(
+      `**I'm not current connected to a channel!**`
+    );
+  } else if (
+    message.guild.me.voiceChannel &&
+    message.guild.me.voiceChannel !== message.member.voiceChannel
+  ) {
+    return await message.channel.send(
+      `**Sorry, I'm currently being used already!**`
+    );
+  }
+  const dispatcher = message.guild.voiceConnection.dispatcher;
+
+  if (!dispatcher) {
+    return await message.channel.send(
+      `**I'm not currently playing any music!**`
+    );
+  }
+
+  dispatcher.end();
 }
 
 //  LEAVE COMMAND
@@ -125,7 +156,9 @@ export async function handleLeaveCommand(message: discord.Message) {
       `**Please connect to a voice channel to use this command!**`
     );
   } else if (!message.guild.me.voiceChannel) {
-    return await message.channel.send(`**I'm not currently in a channel!**`);
+    return await message.channel.send(
+      `**I'm not current connected to a channel!**`
+    );
   } else if (
     message.guild.me.voiceChannel &&
     message.guild.me.voiceChannel !== message.member.voiceChannel
