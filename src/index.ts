@@ -15,6 +15,8 @@ import {
   handleStopCommand,
   skipCommand,
   handleSkipCommand,
+  queueCommand,
+  handleQueueCommand,
   leaveCommand,
   handleLeaveCommand,
 } from "./commands/music";
@@ -35,6 +37,8 @@ client.on("message", async (message) => {
   if (message.content.startsWith(joinCommand)) await handleJoinCommand(message);
   if (message.content.startsWith(playCommand)) await handlePlayCommand(message);
   if (message.content.startsWith(stopCommand)) await handleStopCommand(message);
+  if (message.content.startsWith(queueCommand))
+    await handleQueueCommand(message);
   if (message.content.startsWith(skipCommand)) await handleSkipCommand(message);
   if (message.content.startsWith(leaveCommand))
     await handleLeaveCommand(message);

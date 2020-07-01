@@ -7,6 +7,7 @@ export const joinCommand = `${process.env.PREFIX}join`;
 export const playCommand = `${process.env.PREFIX}play`;
 export const stopCommand = `${process.env.PREFIX}stop`;
 export const skipCommand = `${process.env.PREFIX}skip`;
+export const queueCommand = `${process.env.PREFIX}queue`;
 export const leaveCommand = `${process.env.PREFIX}leave`;
 
 let playQueue: string[] = [];
@@ -97,7 +98,7 @@ export async function handleStopCommand(message: discord.Message) {
     );
   } else if (!message.guild.me.voiceChannel) {
     return await message.channel.send(
-      `**I'm not current connected to a channel!**`
+      `**I'm not currently connected to a channel!**`
     );
   } else if (
     message.guild.me.voiceChannel &&
@@ -128,7 +129,7 @@ export async function handleSkipCommand(message: discord.Message) {
     );
   } else if (!message.guild.me.voiceChannel) {
     return await message.channel.send(
-      `**I'm not current connected to a channel!**`
+      `**I'm not currently connected to a channel!**`
     );
   } else if (
     message.guild.me.voiceChannel &&
@@ -149,6 +150,35 @@ export async function handleSkipCommand(message: discord.Message) {
   dispatcher.end();
 }
 
+//  QUEUE COMMAND
+export async function handleQueueCommand(message: discord.Message) {
+  if (!message.member.voiceChannel) {
+    return await message.channel.send(
+      `**Please connect to a voice channel to use this command!**`
+    );
+  } else if (!message.guild.me.voiceChannel) {
+    return await message.channel.send(
+      `**I'm not currently connected to a channel!**`
+    );
+  } else if (
+    message.guild.me.voiceChannel &&
+    message.guild.me.voiceChannel !== message.member.voiceChannel
+  ) {
+    return await message.channel.send(
+      `**Sorry, I'm currently being used already!**`
+    );
+  }
+  const nowPlaying = await ytdl.getInfo(playQueue[0]);
+
+  message.channel.send(`**Currently playing:**\n*${nowPlaying.title}*\n`);
+
+  message.channel.send(`**Queue:**\n`);
+  for (var i = 1; i < playQueue.length; i++) {
+    const info = await ytdl.getInfo(playQueue[i]);
+    message.channel.send(`*${info.title}*`);
+  }
+}
+
 //  LEAVE COMMAND
 export async function handleLeaveCommand(message: discord.Message) {
   if (!message.member.voiceChannel) {
@@ -157,7 +187,7 @@ export async function handleLeaveCommand(message: discord.Message) {
     );
   } else if (!message.guild.me.voiceChannel) {
     return await message.channel.send(
-      `**I'm not current connected to a channel!**`
+      `**I'm not currently connected to a channel!**`
     );
   } else if (
     message.guild.me.voiceChannel &&
