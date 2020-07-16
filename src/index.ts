@@ -1,13 +1,14 @@
 import * as discord from "discord.js";
 import { config } from "dotenv";
 import * as _ from "lodash";
-
 import { gifCommands, handleGifCommand } from "./commands/gif";
 import {
   joinCommands,
   handleJoinCommand,
   playCommands,
   handlePlayCommand,
+  searchCommands,
+  handleSearchCommand,
   stopCommands,
   handleStopCommand,
   skipCommands,
@@ -18,7 +19,9 @@ import {
   handleLeaveCommand,
 } from "./commands/music";
 
-const prefixes = ["/", "?"];
+config();
+
+const prefixes = ["/", "!"];
 
 function handleCommand(
   message: discord.Message,
@@ -40,7 +43,6 @@ function handleCommand(
 }
 
 const client = new discord.Client();
-config();
 
 client.once("ready", () => {
   console.log("Ready!");
@@ -51,12 +53,16 @@ client.once("reconnecting", () => {
 client.once("disconnecting", () => {
   console.log("Disconnecting!");
 });
+client.on("message", (message) => {
+  if (message.author.bot) return;
+});
 
 client.on("message", async (message) => {
   const commands = [
     { commands: gifCommands, handle: handleGifCommand },
     { commands: joinCommands, handle: handleJoinCommand },
     { commands: playCommands, handle: handlePlayCommand },
+    { commands: searchCommands, handle: handleSearchCommand },
     { commands: stopCommands, handle: handleStopCommand },
     { commands: queueCommands, handle: handleQueueCommand },
     { commands: skipCommands, handle: handleSkipCommand },

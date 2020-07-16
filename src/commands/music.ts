@@ -1,16 +1,21 @@
 import * as discord from "discord.js";
-// import * as youtubeSearch from "youtube-search";
+import { google } from "googleapis";
 import * as ytdl from "ytdl-core";
 import * as _ from "lodash";
 
 export const joinCommands = ["join", "j", "connect"];
 export const playCommands = ["play", "p"];
+export const searchCommands = ["search", "s"];
 export const stopCommands = ["stop", "st"];
 export const skipCommands = ["skip", "sk"];
 export const queueCommands = ["queue", "q"];
 export const leaveCommands = ["leave", "l", "exit", "disconnect"];
 
 let playQueue: string[] = [];
+const youtube = google.youtube({
+  version: "v3",
+  auth: process.env.YOUTUBE_TOKEN,
+});
 
 //  JOIN COMMAND
 export async function handleJoinCommand(message: discord.Message) {
@@ -204,4 +209,93 @@ export async function handleLeaveCommand(message: discord.Message) {
   }
   message.guild.me.voiceChannel.leave();
   return await message.channel.send(`**See you next time!**`);
+}
+
+//  SEARCH COMMAND
+export async function handleSearchCommand(message: discord.Message) {
+  if (!message.member.voiceChannel) {
+    return await message.channel.send(
+      `**Please connect to a voice channel to use this command!**`
+    );
+  } else if (
+    message.guild.me.voiceChannel &&
+    message.guild.me.voiceChannel !== message.member.voiceChannel
+  ) {
+    return await message.channel.send(
+      `**Sorry, I'm currently being used already!**`
+    );
+  }
+
+  let embed = new discord.RichEmbed()
+    .setColor("#73ffdc")
+    .setDescription(
+      "Please enter a search query. Remember to narrow down your search!"
+    )
+    .setTitle("Youtube Search");
+
+  await message.channel.send(embed);
+
+  const filter = (m: discord.Message) => m.author.id === message.author.id;
+  const queries = await message.channel.awaitMessages(filter, {
+    max: 1,
+  });
+  const query = queries.values().next().value.content;
+  const videoSearch = await youtube.search.list({
+    part: ["snippet"],
+    type: ["video"],
+    q: query,
+    maxResults: 5,
+  });
+  const results = await youtube.videos.list({
+    part: ["contentDetails", "snippet"],
+    id: _.compact(_.map(videoSearch.data.items, (item) => item.id?.videoId)),
+  });
+
+  const youtubeResults = results.data.items;
+
+  const titles = _.map(youtubeResults, (result, index) => {
+    return index + 1 + ") " + result.snippet?.title;
+  });
+
+  if (youtubeResults === undefined) {
+    return await message.channel.send(
+      "There were no results for your search. Please try again."
+    );
+  }
+
+  message.channel.send({
+    embed: {
+      title:
+        "Select which song you want to play by typing the corresponding number!",
+      description: titles.join("\n"),
+    },
+  });
+
+  const collectedFromAuthor = await message.channel.awaitMessages(
+    (m: discord.Message) => m.author.id === message.author.id,
+    {
+      maxMatches: 1,
+    }
+  );
+
+  if (
+    collectedFromAuthor.values().next().value.content < "1" ||
+    collectedFromAuthor.values().next().value.content > "5"
+  ) {
+    console.log(collectedFromAuthor.values().next().value.content);
+    return await message.channel.send(
+      "Please enter a valid number according to the song that you want to play!"
+    );
+  }
+
+  const selectedSong =
+    youtubeResults[collectedFromAuthor.values().next().value.content - 1];
+
+  embed = new discord.RichEmbed()
+    .setColor("#73ffdc")
+    .setTitle(`${selectedSong.snippet?.title}`)
+    .setURL(`https://www.youtube.com/watch?v=${selectedSong.id}`)
+    .setThumbnail(`${selectedSong.snippet?.thumbnails?.maxres?.url}`);
+
+  message.channel.send(embed);
 }

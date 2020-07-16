@@ -16,10 +16,10 @@
     "ffmpeg": "0.0.4",
     "ffmpeg-binaries": "^4.0.0",
     "giphy-js-sdk-core": "^1.0.6",
+    "googleapis": "^54.0.0",
     "lodash": "^4.17.15",
     "opusscript": "0.0.7",
     "ts-node-dev": "^1.0.0-pre.44",
-    "youtube-search": "^1.1.4",
     "ytdl-core": "^2.1.7"
   },
   "devDependencies": {

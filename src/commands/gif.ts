@@ -1,6 +1,8 @@
 import * as discord from "discord.js";
+import { config } from "dotenv";
 import * as gphApiClient from "giphy-js-sdk-core";
 
+config();
 const giphy = gphApiClient(process.env.GIPHY_TOKEN);
 
 export const gifCommands = ["gif", "g", "giphy"];
