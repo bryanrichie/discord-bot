@@ -3,6 +3,7 @@
     "incremental": true,
     "target": "es5",
     "strict": true,
-    "outDir": "./dist/"
-  }
+    "outDir": "dist"
+  },
+  "include": ["src"]
 }
