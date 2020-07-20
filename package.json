@@ -10,23 +10,25 @@
     "develop": "ts-node-dev src/index.ts",
     "compile": "tsc --noEmit"
   },
+  "engines": {
+    "node": "10.x"
+  },
   "author": "Bryan Lee",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.6.4",
+    "dotenv": "^8.2.0",
     "ffmpeg": "0.0.4",
-    "ffmpeg-binaries": "^4.0.0",
+    "opusscript": "0.0.7",
     "giphy-js-sdk-core": "^1.0.6",
     "googleapis": "^54.0.0",
     "lodash": "^4.17.15",
-    "opusscript": "0.0.7",
     "ts-node-dev": "^1.0.0-pre.44",
-    "ytdl-core": "^2.1.7"
+    "ytdl-core": "^3.1.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.157",
     "@types/node": "^13.13.4",
-    "dotenv": "^8.2.0",
     "typescript": "^3.8.3"
   }
 }

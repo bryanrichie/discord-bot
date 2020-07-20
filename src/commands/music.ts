@@ -177,30 +177,37 @@ export async function handleQueueCommand(message: discord.Message) {
       `**Sorry, I'm currently being used already!**`
     );
   }
-  const nowPlaying = await ytdl.getInfo(playQueue[0]);
-  const queue = await Promise.all(
-    _.map(_.drop(playQueue, 1), async (song) => {
-      const info = await ytdl.getInfo(song);
-      return `${info.title}\n`;
-    })
-  );
 
-  const embed = new discord.RichEmbed({
-    title: "Queue",
-    color: 0x73ffdc,
-    fields: [
-      {
-        name: "**Currently Playing:**",
-        value: nowPlaying.title,
-      },
-      {
-        name: "**Upcoming:**",
-        value: `${queue}`,
-      },
-    ],
-  });
+  if (_.isEmpty(playQueue)) {
+    return await message.channel.send(
+      `**There are currently no songs in the queue!**`
+    );
+  } else {
+    const nowPlaying = await ytdl.getInfo(playQueue[0]);
+    const queue = await Promise.all(
+      _.map(_.drop(playQueue, 1), async (song) => {
+        const info = await ytdl.getInfo(song);
+        return `${info.title}\n`;
+      })
+    );
 
-  message.channel.send(embed);
+    const embed = new discord.RichEmbed({
+      title: "Queue",
+      color: 0x73ffdc,
+      fields: [
+        {
+          name: "**Currently Playing:**",
+          value: nowPlaying.title,
+        },
+        {
+          name: "**Upcoming:**",
+          value: `${queue}`,
+        },
+      ],
+    });
+
+    message.channel.send(embed);
+  }
 }
 
 //  LEAVE COMMAND
