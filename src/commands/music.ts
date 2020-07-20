@@ -73,7 +73,7 @@ export async function handlePlayCommand(
     );
   }
 
-  const dispatch = () => {
+  const dispatch = async () => {
     const stream = connection.playStream(
       ytdl(playQueue[0], {
         filter: "audioonly",
@@ -81,11 +81,12 @@ export async function handlePlayCommand(
       })
     );
 
-    stream.on("end", () => {
+    stream.on("end", async () => {
       playQueue = _.drop(playQueue, 1);
       if (!_.isEmpty(playQueue)) {
-        //  called again if there are still songs to play
+        const nowPlaying = await ytdl.getInfo(playQueue[0]);
         dispatch();
+        message.channel.send(`**Now playing: ${nowPlaying.title}**`);
       }
     });
 
@@ -180,13 +181,26 @@ export async function handleQueueCommand(message: discord.Message) {
   const queue = await Promise.all(
     _.map(_.drop(playQueue, 1), async (song) => {
       const info = await ytdl.getInfo(song);
-      return info.title;
+      return `${info.title}\n`;
     })
   );
 
-  message.channel.send(
-    `**Currently playing:**\n\t*${nowPlaying.title}*\n**Queue:**\n\t*${queue}*`
-  );
+  const embed = new discord.RichEmbed({
+    title: "Queue",
+    color: 0x73ffdc,
+    fields: [
+      {
+        name: "**Currently Playing:**",
+        value: nowPlaying.title,
+      },
+      {
+        name: "**Upcoming:**",
+        value: `${queue}`,
+      },
+    ],
+  });
+
+  message.channel.send(embed);
 }
 
 //  LEAVE COMMAND
@@ -280,25 +294,26 @@ export async function handleSearchCommand(
     },
   });
 
-  const collectedFromAuthor = await message.channel.awaitMessages(
+  const collected = await message.channel.awaitMessages(
     (m: discord.Message) => m.author.id === message.author.id,
     {
       maxMatches: 1,
     }
   );
 
+  const collectedAsInt = _.parseInt(collected.values().next().value.content);
+
   if (
-    collectedFromAuthor.values().next().value.content < "1" ||
-    collectedFromAuthor.values().next().value.content > "5"
+    collectedAsInt < 1 ||
+    collectedAsInt > 5 ||
+    !_.isInteger(collectedAsInt)
   ) {
-    console.log(collectedFromAuthor.values().next().value.content);
     return await message.channel.send(
       "Please enter a valid number according to the song that you want to play!"
     );
   }
 
-  const selectedSong =
-    youtubeResults[collectedFromAuthor.values().next().value.content - 1];
+  const selectedSong = youtubeResults[collectedAsInt - 1];
 
   const embed = new discord.RichEmbed()
     .setColor("#73ffdc")
@@ -307,4 +322,38 @@ export async function handleSearchCommand(
     .setThumbnail(`${selectedSong.snippet?.thumbnails?.maxres?.url}`);
 
   message.channel.send(embed);
+
+  const connection = await message.member.voiceChannel.join();
+
+  playQueue.push(`https://www.youtube.com/watch?v=${selectedSong.id}`);
+
+  if (playQueue.length > 1) {
+    return await message.channel.send(
+      `**${selectedSong.snippet?.title} has been added to the queue!**`
+    );
+  }
+
+  const dispatch = () => {
+    const stream = connection.playStream(
+      ytdl(playQueue[0], {
+        filter: "audioonly",
+        quality: "highestaudio",
+      })
+    );
+
+    stream.on("end", async () => {
+      playQueue = _.drop(playQueue, 1);
+      if (!_.isEmpty(playQueue)) {
+        const nowPlaying = await ytdl.getInfo(playQueue[0]);
+        dispatch();
+        message.channel.send(`**Now playing: ${nowPlaying.title}**`);
+      }
+    });
+
+    stream.setVolume(0.2);
+  };
+
+  dispatch();
+
+  await message.channel.send(`**Now playing: ${selectedSong.snippet?.title}**`);
 }
