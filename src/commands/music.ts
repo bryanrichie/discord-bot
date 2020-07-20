@@ -212,7 +212,10 @@ export async function handleLeaveCommand(message: discord.Message) {
 }
 
 //  SEARCH COMMAND
-export async function handleSearchCommand(message: discord.Message) {
+export async function handleSearchCommand(
+  message: discord.Message,
+  query: string
+) {
   if (!message.member.voiceChannel) {
     return await message.channel.send(
       `**Please connect to a voice channel to use this command!**`
@@ -226,26 +229,32 @@ export async function handleSearchCommand(message: discord.Message) {
     );
   }
 
-  let embed = new discord.RichEmbed()
-    .setColor("#73ffdc")
-    .setDescription(
-      "Please enter a search query. Remember to narrow down your search!"
-    )
-    .setTitle("Youtube Search");
+  let q = query;
 
-  await message.channel.send(embed);
+  if (!query) {
+    const embed = new discord.RichEmbed()
+      .setColor("#73ffdc")
+      .setDescription(
+        "Please enter a search query. Remember to narrow down your search!"
+      )
+      .setTitle("Youtube Search");
 
-  const filter = (m: discord.Message) => m.author.id === message.author.id;
-  const queries = await message.channel.awaitMessages(filter, {
-    max: 1,
-  });
-  const query = queries.values().next().value.content;
+    await message.channel.send(embed);
+
+    const filter = (m: discord.Message) => m.author.id === message.author.id;
+    const queries = await message.channel.awaitMessages(filter, {
+      max: 1,
+    });
+    q = queries.values().next().value.content;
+  }
+
   const videoSearch = await youtube.search.list({
     part: ["snippet"],
     type: ["video"],
-    q: query,
+    q,
     maxResults: 5,
   });
+
   const results = await youtube.videos.list({
     part: ["contentDetails", "snippet"],
     id: _.compact(_.map(videoSearch.data.items, (item) => item.id?.videoId)),
@@ -291,7 +300,7 @@ export async function handleSearchCommand(message: discord.Message) {
   const selectedSong =
     youtubeResults[collectedFromAuthor.values().next().value.content - 1];
 
-  embed = new discord.RichEmbed()
+  const embed = new discord.RichEmbed()
     .setColor("#73ffdc")
     .setTitle(`${selectedSong.snippet?.title}`)
     .setURL(`https://www.youtube.com/watch?v=${selectedSong.id}`)
