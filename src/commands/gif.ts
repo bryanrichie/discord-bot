@@ -1,5 +1,6 @@
 import * as discord from "discord.js";
 import { config } from "dotenv";
+//@ts-ignore
 import * as gphApiClient from "giphy-js-sdk-core";
 
 config();
