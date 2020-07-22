@@ -95,7 +95,7 @@ export async function handlePlayCommand(
 
   dispatch();
 
-  await message.channel.send(`**Now playing: ${info.title}**`);
+  await message.channel.send(`**Now playing: ${info.videoDetails.title}**`);
 }
 
 //  STOP COMMAND

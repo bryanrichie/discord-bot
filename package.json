@@ -19,6 +19,7 @@
     "discord.js": "^11.6.4",
     "dotenv": "^8.2.0",
     "ffmpeg": "0.0.4",
+    "ffmpeg-binaries": "^4.0.0",
     "opusscript": "0.0.7",
     "giphy-js-sdk-core": "^1.0.6",
     "googleapis": "^54.0.0",
