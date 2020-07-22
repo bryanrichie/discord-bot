@@ -74,6 +74,7 @@ export async function handlePlayCommand(
   }
 
   const dispatch = async () => {
+    console.log("running dispatch function");
     const stream = connection.playStream(
       ytdl(playQueue[0], {
         filter: "audioonly",
@@ -81,7 +82,10 @@ export async function handlePlayCommand(
       })
     );
 
+    console.log("playing the stream");
+
     stream.on("end", async () => {
+      console.log("stream ended");
       playQueue = _.drop(playQueue, 1);
       if (!_.isEmpty(playQueue)) {
         const nowPlaying = await ytdl.getInfo(playQueue[0]);
@@ -93,7 +97,13 @@ export async function handlePlayCommand(
     stream.setVolume(0.2);
   };
 
-  dispatch();
+  try {
+    await dispatch();
+  } catch (err) {
+    console.log("got an error", err);
+  }
+
+  console.log("finished dispatching");
 
   await message.channel.send(`**Now playing: ${info.videoDetails.title}**`);
 }
