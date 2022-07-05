@@ -16,7 +16,7 @@
   "author": "Bryan Lee",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/opus": "^0.3.2",
+    "@discordjs/opus": "^0.8.0",
     "discord.js": "^11.6.4",
     "dotenv": "^8.2.0",
     "ffmpeg-static": "^4.2.6",
